@@ -46,14 +46,14 @@ After network latency, the largest source of delay is the performance of the Bel
 
 ### Zero Belief propagation delay
 
-Because CPoS operated as a CRDT, Peers can immediately propagate a Belief as soon as they have perfromed a Belief merge. Propagating a new Belief as soon as one has been updated is the default behaviour for Peers, and is optimal for low latency performance. Because belief merges are idempotent, there is no harm in broadcasting a Belief multiple times.
+Because CPoS operates as a CRDT, Peers can immediately propagate a Belief as soon as they have performed a Belief merge. Propagating a new Belief as soon as one has been updated is the default behaviour for Peers, and is optimal for low latency performance. Because belief merges are idempotent, there is no harm in broadcasting a Belief multiple times.
 
 ### Delta Transmission
 
 Beliefs are large data structures, and it would be a significant performance cost if the entire Belief needed to be transmitted every time one was propagated - adding significant latency delays in Stage 4. Fortunately, we are able to send only the Deltas (changes) to a Belief in most circumstances. This is possible because:
 - Beliefs are structured as Merkle DAGs, allowing the integrity of the whole structure to be validated
 - We track which parts of a Belief have already been broadcast, and normally omit sending these again
-- Reveivers of Beliefs can verify the Belief by examining the cryptographic hashes from the root of the Merkle DAG, and in most cases confirm that they already hold the rest of the data structre required. If not, they can always recover by explicitly requesting a missing piece of data (which again, they can identify using the cryptographic hash)
+- Receivers of Beliefs can verify the Belief by examining the cryptographic hashes from the root of the Merkle DAG, and in most cases confirm that they already hold the rest of the data structre required. If not, they can always recover by explicitly requesting a missing piece of data (which again, they can identify using the cryptographic hash)
 
 In many ways, Belief propagation can be seen as analogous to the efficient storage and merging of source code trees utilised in the Git version control system. 
 
@@ -87,13 +87,13 @@ Block processing in general is very quick because:
 
 ## Throughput
 
-Convex targets a peak transaction throughput of 100,000+ transactions per second. This is many orders of magnitude faster than traditional blockchains, and even faster than centralised payment systems such as VISA (which might typically handle in the range of 1700 TPS). The key to achieving this perfoamance is the sucecssive elimination of bottlenecks to performance, and choosing an architecture that makes it possible to efficiently utilise Peer resources.
+Convex targets a peak transaction throughput of 100,000+ transactions per second. This is many orders of magnitude faster than traditional blockchains, and even faster than centralised payment systems such as VISA (which might typically handle in the range of 1700 TPS). The key to achieving this performance is the successive elimination of bottlenecks to performance, and choosing an architecture that makes it possible to efficiently utilise Peer resources.
 
-### Staged Event Driven Architacture
+### Staged Event Driven Architecture
 
 We emply a staged event-driven architecture (SEDA) within Peers to optimise throughput and ensure that expensive work is performed concurrently on different threads. Hence overall throughput is maximised by maximising the throughput at each stage.
 
-Stages are connected with efficient in-memory queues which can easily transfer millions of events per second. This queue based approach helps up to manage complexity by clearly decopling the different stages and also allows for backpressure to be used to manage periods of high loads (an essential technique for high volume distributed systems).
+Stages are connected with efficient in-memory queues which can easily transfer millions of events per second. This queue based approach helps up to manage complexity by clearly decoupling the different stages and also allows for backpressure to be used to manage periods of high loads (an essential technique for high volume distributed systems).
 
 The most important stages are:
 1. Network ingestion, where a NIO Server reads messages from the network at maximum speed and puts these messages on an in-memoery queue
@@ -109,8 +109,8 @@ Convex is agnostic to the underlying hardware architecture used, however this co
 
 The CVM is a highly optimised execution engine. Some notable points:
 
-- Data structures and algorithms are all implement in efficient, low level JVM code (often with bitwise operations!)
-- CVM code is compiled down to efficient "Ops", where a typical transaction might require 10-50 Ops to be executed. This is effectively the "machine code" of the JVM, and corresponds to operations typical in an implementation of the Lambda Calculus - becuase of the power af the lambda calculus, we usually require less Ops than the equivalent for a stack based machine
+- Data structures and algorithms are all implement in efficient, low level JVM code (often with bitwise operations)
+- CVM code is compiled down to efficient "Ops", where a typical transaction might require 10-50 Ops to be executed. This is effectively the "machine code" of the JVM, and corresponds to operations typical in an implementation of the Lambda Calculus - because of the power af the lambda calculus, we usually require less Ops than the equivalent for a stack based machine
 - We can rely on the JVM JIT to further compile key code paths down to efficient native code
 
 The `OpBenckmark` is a microbenchmark of several different groups of Ops, and demonstrates that up to hundreds of millions of Ops can be executed per second on a single thread:
@@ -148,7 +148,7 @@ Database stoarge is often a significant bottleneck in computational systems that
 - Embedded encodings of small values mean that many values can typically be read or written in a single storage call
 - High performance, memory mapped file access
 
-Our `EtchBenchmark` suggests that Etch can handle approximately 5 million reads per second, and 800,000 writes per second on a regular laptop. This compares highly favouraby with alternative database engines, and means we can comfortably achive 100,000+ TPS (most transactions are likely to require only a small number of writes, especially given the embedding of small values). Reads can furthermore be executed concurrently on multiple threads, which is particularly helpful for query performance.
+Our `EtchBenchmark` suggests that Etch can handle approximately 5 million reads per second, and 800,000 writes per second on a regular laptop. This compares highly favourably with alternative database engines, and means we can comfortably achive 100,000+ TPS (most transactions are likely to require only a small number of writes, especially given the embedding of small values). Reads can furthermore be executed concurrently on multiple threads, which is particularly helpful for query performance.
 
 ### Network bandwidth
 
